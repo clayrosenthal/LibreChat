@@ -39,6 +39,12 @@ spec:
           volumeMounts:
             - name: librechat-config
               mountPath: /app/config
+            {{- with .Values.volumes }}
+            {{- range . }}
+            - name: {{ .name }}
+              mountPath: /opt/{{ .name }}
+            {{- end }}
+            {{- end }}
           envFrom:
             {{ if .Values.config.envSecrets.secretRef }}
             - secretRef:
@@ -88,3 +94,6 @@ spec:
         - name: librechat-config
           configMap:
             name: {{ include "librechat.fullname" . }}-file
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
