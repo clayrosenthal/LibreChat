@@ -36,6 +36,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: librechat-config
+              mountPath: /app/config
           envFrom:
             {{ if .Values.config.envSecrets.secretRef }}
             - secretRef:
@@ -44,6 +47,8 @@ spec:
             - configMapRef:
                 name: {{ include "librechat.fullname" . }}-env
           env:
+            - name: CONFIG_FILE
+              value: /app/config/librechat.yaml
             {{- range $secretKeyRef := .Values.config.envSecrets.secretKeyRef }}
             - name: {{ $secretKeyRef.name }}
               valueFrom:
@@ -79,3 +84,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: librechat-config
+          configMap:
+            name: {{ include "librechat.fullname" . }}-file
