@@ -53,7 +53,7 @@ spec:
             - configMapRef:
                 name: {{ include "librechat.fullname" . }}-env
           env:
-            - name: CONFIG_FILE
+            - name: CONFIG_PATH
               value: /app/config/librechat.yaml
             {{- range $secretKeyRef := .Values.config.envSecrets.secretKeyRef }}
             - name: {{ $secretKeyRef.name }}
