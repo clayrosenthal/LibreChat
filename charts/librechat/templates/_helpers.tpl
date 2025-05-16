@@ -72,3 +72,33 @@ Print string from list split by ,
 {{- $val -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Init container to download document db ca
+*/}}
+{{- define "librechat.downloadDocumentDbCaContainer" -}}
+{{- if .Values.config.downloadDocumentDbCa }}
+initContainers:
+- image: alpine/curl
+  imagePullPolicy: Always
+  name: ddb-ca-downloader
+  args:
+  - -sSL 
+  - https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+  - -o
+  - /opt/ddb-ca/global-bundle.pem
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: "100m"
+      memory: 128Mi
+  volumeMounts:
+  - mountPath: /opt/ddb-ca
+    name: ddb-ca
+{{- else }}
+{{- end }}
+{{- end }}
+
+    

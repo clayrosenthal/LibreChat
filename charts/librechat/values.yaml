@@ -69,12 +69,6 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-# extra volumes to mount, mounted to /opt/{name}
-volumes: []
-# - name: extra-volume
-#   configMap:
-#     name: extra-configmap
-
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -89,6 +83,10 @@ tolerations: []
 affinity: {}
   
 config:
+  # Download the DocumentDB CA certificate and save it to a file
+  # This is needed to connect to the DocumentDB instance
+  # This is only needed if you are using DocumentDB
+  downloadDocumentDbCa: false
   envSecrets:
     # Use this when using one k8s secret for multiply env secrets
     # secretRef: librechat
@@ -118,7 +116,7 @@ config:
     SEARCH: false 
   
   librechatYaml:
-    version: 1.0.8
+    version: 1.2.4
     cache: true
     interface:
       # Privacy policy settings

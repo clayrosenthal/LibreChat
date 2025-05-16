@@ -30,6 +30,9 @@ spec:
       serviceAccountName: {{ include "librechat.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.config.downloadDocumentDbCa }}
+      {{- include "librechat.downloadDocumentDbCaContainer" . | nindent 6 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -39,11 +42,10 @@ spec:
           volumeMounts:
             - name: librechat-config
               mountPath: /app/config
-            {{- with .Values.volumes }}
-            {{- range . }}
-            - name: {{ .name }}
-              mountPath: /opt/{{ .name }}
-            {{- end }}
+            {{- if .Values.config.downloadDocumentDbCa }}
+            - name: ddb-ca
+              mountPath: /opt/ddb-ca
+              readOnly: true
             {{- end }}
           envFrom:
             {{ if .Values.config.envSecrets.secretRef }}
@@ -94,6 +96,8 @@ spec:
         - name: librechat-config
           configMap:
             name: {{ include "librechat.fullname" . }}-file
-        {{- with .Values.volumes }}
-        {{- toYaml . | nindent 8 }}
+        {{- if .Values.config.downloadDocumentDbCa }}
+        - name: ddb-ca
+          emptyDir:
+            sizeLimit: 1Mi
         {{- end }}
